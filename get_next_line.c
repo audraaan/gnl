@@ -6,7 +6,7 @@
 /*   By: alarroye <alarroye@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:34:12 by alarroye          #+#    #+#             */
-/*   Updated: 2024/12/07 14:12:51 by alarroye         ###   ########lyon.fr   */
+/*   Updated: 2024/12/11 22:38:16 by alarroye         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,116 +23,83 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
-{
-	char	*res;
-	size_t	ls1;
-	size_t	ls2;
-	size_t	i;
-
-	ls1 = ft_strlen(s1);
-	ls2 = ft_strlen(s2);
-	res = malloc((ls1 + ls2 + 1) * sizeof(char));
-	if (!res)
-		return (NULL);
-	i = 0;
-	while (i < ls1)
-	{
-		res[i] = s1[i];
-		i++;
-	}
-	i = 0;
-	while (i < ls2)
-	{
-		res[ls1] = s2[i];
-		ls1++;
-		i++;
-	}
-	res[ls1] = '\0';
-	return (res);
-}
-
-char	*ft_strchr(const char *s, int c)
+int	ft_n(char *str)
 {
 	int	i;
 
-	c = (char)c;
 	i = 0;
-	while (s[i])
-	{
-		if (s[i] == c)
-			return ((char *)&s[i]);
+	while (str[i] && str[i] != '\n')
 		i++;
-	}
-	if ((char)c == '\0')
-		return ((char *)&s[i]);
-	return (NULL);
+	if (str[i] == '\n')
+		i++;
+	else
+		i = 0;
+	return (i);
 }
 
-char	*ft_strdup(const char *s)
+void	*ft_calloc(size_t nmemb, size_t size)
 {
-	char	*dest;
-	int		i;
+	void	*res;
 
-	i = 0;
-	while (s[i])
-		i++;
-	dest = (char *)malloc(i * sizeof(char) + 1);
-	if (dest == NULL)
+	res = malloc(size * nmemb);
+	if (res == NULL)
 		return (NULL);
-	i = 0;
-	while (s[i])
-	{
-		dest[i] = s[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
+	ft_memset(res, 0, size * nmemb);
+	return (res);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	buf[BUFFER_SIZE + 1] = {0};
-	int			i;
-	int			y;
+	static char	tmp[BUFFER_SIZE + 1];
+	int			len;
 	int			nb_read;
-	char		*res;
+	char		*line;
+	char		buf[BUFFER_SIZE + 1];
 
-	i = 0;
-	y = -1;
-	res = ft_strdup(buf);
-	while (res[i])
+	if ((fd < 0) || (BUFFER_SIZE <= 0)) // si pb tu null
+		return (NULL);
+	line = ft_calloc(sizeof(char), 1);
+	if (!line)
+		return (NULL);
+	ft_memset(buf, 0, BUFFER_SIZE + 1);
+	len = 0;
+	nb_read = 1;
+	// printf("\n      <INIT>\ntmp : %s;\nline : %s;\n", tmp, line);
+	if (*tmp) // si ya surplu
 	{
-		if (res[i] == '\n')
-			while (res[i])
-				res[y++] = res[i++];
-		while (res[y])
+		if (ft_n(tmp) != 0)
 		{
-			ft_memset(&res[y], '\0', ft_strlen(res) - y);
-			y++;
+			len = ft_n(tmp);                                 // si ya \n
+			ft_memcpy(line, tmp, len);                       // fou la line
+			ft_memcpy(tmp, tmp + len, ft_strlen(tmp + len)); // maj de tmp
+			return (line);
 		}
-		i++;
+		else
+		{
+			len = ft_strlen(tmp);                            // si a pas\n
+			ft_memcpy(line, tmp, len);                       // fou la line
+			ft_memcpy(tmp, tmp + len, ft_strlen(tmp + len)); // maj de tmp
+		}
 	}
-	printf("\n      INIT\nbuf = %s;\nres = %s;\n", buf, res);
-	while (ft_strchr(res, '\n') == NULL)
+	while (1)
 	{
+		// printf("\n      <BOUCLE>\ntmp : %s;\nline : %s;\n", tmp, line);
 		nb_read = read(fd, buf, BUFFER_SIZE);
-		if (nb_read == 0)
-		{
+		if (nb_read < 0) // si pb
+			return (free(line), ft_memset(buf, 0, BUFFER_SIZE + 1), NULL);
+		if ((nb_read == 0) && !line[0]) // si fin du file
+			return (free(line), NULL);
+		buf[nb_read] = '\0';
+		line = ft_strjoin(line, buf);
+		if (!line)
 			return (NULL);
+		len = ft_n(buf);
+		if (len)
+		{
+			ft_memcpy(tmp, buf + len, ft_strlen(buf + len)); // met le reste tmp
+			return (line);
 		}
-		res = ft_strjoin(res, buf);
-		printf("\n      BOUCLE\nbuf = %s;\nres = %s;\n", buf, res);
 	}
-	i = 0;
-	while (res[i])
-	{
-		if (res[i] == '\n')
-			ft_memset(&res[i + 1], '\0', ft_strlen(res) - i + 1);
-		i++;
-	}
-	printf("\n      END\nbuf = %s;\nres = %s;\n", buf, res);
-	return (res);
 }
 
 int	main(void)
@@ -140,10 +107,15 @@ int	main(void)
 	int fd;
 	int i = 0;
 	fd = open("./test.txt", O_RDONLY);
-	while (i < 5)
+
+	while (i < 6)
 	{
-		printf("\n      SORTIIIIIIIIIIIIIII\n%s", get_next_line(fd));
+		
+		char *connard = get_next_line(fd);
+		printf("\n      <SORTIIIIIIIIIIIIIII\n%s;", connard);
+		free(connard);
 		i++;
 	}
 	close(fd);
+	return (0);
 }
