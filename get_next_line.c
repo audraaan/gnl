@@ -6,7 +6,7 @@
 /*   By: alarroye <alarroye@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:34:12 by alarroye          #+#    #+#             */
-/*   Updated: 2024/12/11 22:38:16 by alarroye         ###   ########lyon.fr   */
+/*   Updated: 2024/12/14 10:54:32 by alarroye         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,17 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
+void	*ft_calloc(size_t nmemb, size_t size)
+{
+	void	*res;
+
+	res = malloc(size * nmemb);
+	if (res == NULL)
+		return (NULL);
+	ft_memset(res, 0, size * nmemb);
+	return (res);
+}
+
 int	ft_n(char *str)
 {
 	int	i;
@@ -37,58 +48,49 @@ int	ft_n(char *str)
 	return (i);
 }
 
-void	*ft_calloc(size_t nmemb, size_t size)
-{
-	void	*res;
-
-	res = malloc(size * nmemb);
-	if (res == NULL)
-		return (NULL);
-	ft_memset(res, 0, size * nmemb);
-	return (res);
-}
-
 char	*get_next_line(int fd)
 {
-	static char	tmp[BUFFER_SIZE + 1];
-	int			len;
-	int			nb_read;
+	static char	sspil[BUFFER_SIZE + 1];
 	char		*line;
-	char		buf[BUFFER_SIZE + 1];
+	int			len;
 
-	if ((fd < 0) || (BUFFER_SIZE <= 0)) // si pb tu null
-		return (NULL);
 	line = ft_calloc(sizeof(char), 1);
-	if (!line)
-		return (NULL);
-	ft_memset(buf, 0, BUFFER_SIZE + 1);
-	len = 0;
-	nb_read = 1;
-	// printf("\n      <INIT>\ntmp : %s;\nline : %s;\n", tmp, line);
-	if (*tmp) // si ya surplu
+	if ((fd < 0) || (BUFFER_SIZE <= 0) || !line)
+		return (free(line), NULL);
+	if (ft_n(sspil) != 0)
 	{
-		if (ft_n(tmp) != 0)
-		{
-			len = ft_n(tmp);                                 // si ya \n
-			ft_memcpy(line, tmp, len);                       // fou la line
-			ft_memcpy(tmp, tmp + len, ft_strlen(tmp + len)); // maj de tmp
-			return (line);
-		}
-		else
-		{
-			len = ft_strlen(tmp);                            // si a pas\n
-			ft_memcpy(line, tmp, len);                       // fou la line
-			ft_memcpy(tmp, tmp + len, ft_strlen(tmp + len)); // maj de tmp
-		}
+		len = ft_n(sspil);
+		line = ft_strjoin(line, sspil);
+		if (!line)
+			return (NULL);
+		ft_memcpy(sspil, sspil + len, ft_strlen(sspil + len));
+		return (line);
 	}
+	else if (*sspil)
+	{
+		len = ft_strlen(sspil);
+		line = ft_strjoin(line, sspil);
+		if (!line)
+			return (NULL);
+		ft_memcpy(sspil, sspil + len, ft_strlen(sspil + len));
+	}
+	return (ft_read(fd, sspil, line));
+}
+
+char	*ft_read(int fd, char *sspil, char *line)
+{
+	static char	buf[BUFFER_SIZE + 1];
+	int			nb_read;
+	int			len;
+
+	ft_memset(buf, 0, BUFFER_SIZE + 1);
 	while (1)
 	{
-		// printf("\n      <BOUCLE>\ntmp : %s;\nline : %s;\n", tmp, line);
 		nb_read = read(fd, buf, BUFFER_SIZE);
-		if (nb_read < 0) // si pb
+		if (nb_read < 0)
 			return (free(line), ft_memset(buf, 0, BUFFER_SIZE + 1), NULL);
-		if ((nb_read == 0) && !line[0]) // si fin du file
-			return (free(line), NULL);
+		if ((nb_read == 0) && !line[0])
+			return (free(line), ft_memset(buf, 0, BUFFER_SIZE + 1), NULL);
 		buf[nb_read] = '\0';
 		line = ft_strjoin(line, buf);
 		if (!line)
@@ -96,26 +98,34 @@ char	*get_next_line(int fd)
 		len = ft_n(buf);
 		if (len)
 		{
-			ft_memcpy(tmp, buf + len, ft_strlen(buf + len)); // met le reste tmp
+			ft_memcpy(sspil, buf + len, ft_strlen(buf + len));
 			return (line);
 		}
+		if (nb_read == 0 && line[0])
+			return (line);
 	}
 }
 
-int	main(void)
-{
-	int fd;
-	int i = 0;
-	fd = open("./test.txt", O_RDONLY);
+// int	main(void)
+// {
+// 	int		fd;
+// 	int		i;
+// 	char	*connard;
 
-	while (i < 6)
-	{
-		
-		char *connard = get_next_line(fd);
-		printf("\n      <SORTIIIIIIIIIIIIIII\n%s;", connard);
-		free(connard);
-		i++;
-	}
-	close(fd);
-	return (0);
-}
+// 	i = 0;
+// 	fd = open("./test.txt", O_RDONLY);
+// 	while (i < 6)
+// 	{
+// 		connard = get_next_line(fd);
+// 		printf("%s;\n", connard);
+// 		free(connard);
+// 		i++;
+// 	}
+// 	close(fd);
+// 	return (0);
+// }
+
+//    V a foutre apres memset
+// printf("\n      <INIT>\ntmp : %s;\nline : %s;\n", sspil, line);
+//      V a foutre apres while(1)
+// printf("\n      <BOUCLE>\ntmp : %s;\nline : %s;\n", sspil, line);

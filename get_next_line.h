@@ -6,14 +6,14 @@
 /*   By: alarroye <alarroye@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:43:10 by alarroye          #+#    #+#             */
-/*   Updated: 2024/12/11 22:27:21 by alarroye         ###   ########lyon.fr   */
+/*   Updated: 2024/12/14 10:26:28 by alarroye         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 6
+#  define BUFFER_SIZE 1
 # endif
 # include <fcntl.h>
 # include <stdlib.h>
@@ -27,4 +27,5 @@ void	*ft_memset(void *s, int c, size_t n);
 char	*ft_strjoin(char *s1, char *s2);
 void	*ft_memcpy(void *dest, const void *src, size_t n);
 int		ft_n(char *str);
+char	*ft_read(int fd, char *sspil, char *line);
 #endif
