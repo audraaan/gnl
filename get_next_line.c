@@ -6,7 +6,7 @@
 /*   By: alarroye <alarroye@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:34:12 by alarroye          #+#    #+#             */
-/*   Updated: 2024/12/14 10:54:32 by alarroye         ###   ########lyon.fr   */
+/*   Updated: 2024/12/14 14:01:51 by alarroye         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ char	*get_next_line(int fd)
 
 	line = ft_calloc(sizeof(char), 1);
 	if ((fd < 0) || (BUFFER_SIZE <= 0) || !line)
-		return (free(line), NULL);
+		return (free(line), ft_memset(sspil, 0, BUFFER_SIZE + 1), NULL);
 	if (ft_n(sspil) != 0)
 	{
 		len = ft_n(sspil);
@@ -88,9 +88,9 @@ char	*ft_read(int fd, char *sspil, char *line)
 	{
 		nb_read = read(fd, buf, BUFFER_SIZE);
 		if (nb_read < 0)
-			return (free(line), ft_memset(buf, 0, BUFFER_SIZE + 1), NULL);
+			return (free(line), ft_memset(sspil, 0, BUFFER_SIZE + 1), NULL);
 		if ((nb_read == 0) && !line[0])
-			return (free(line), ft_memset(buf, 0, BUFFER_SIZE + 1), NULL);
+			return (free(line), ft_memset(sspil, 0, BUFFER_SIZE + 1), NULL);
 		buf[nb_read] = '\0';
 		line = ft_strjoin(line, buf);
 		if (!line)
@@ -117,7 +117,7 @@ char	*ft_read(int fd, char *sspil, char *line)
 // 	while (i < 6)
 // 	{
 // 		connard = get_next_line(fd);
-// 		printf("%s;\n", connard);
+// 		printf("res=%s;\n", connard);
 // 		free(connard);
 // 		i++;
 // 	}

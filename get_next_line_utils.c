@@ -6,7 +6,7 @@
 /*   By: alarroye <alarroye@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 09:32:26 by alarroye          #+#    #+#             */
-/*   Updated: 2024/12/12 02:55:14 by alarroye         ###   ########lyon.fr   */
+/*   Updated: 2024/12/14 14:43:54 by alarroye         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ char	*ft_strjoin(char *s1, char *s2)
 		ls2++;
 	line = malloc((ls1 + ls2 + 1) * sizeof(char));
 	if (!line)
-		return (NULL);
+		return (free (s1), NULL);
 	i = 0;
 	while (i < ls1)
 	{

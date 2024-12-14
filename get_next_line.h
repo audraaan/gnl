@@ -6,14 +6,14 @@
 /*   By: alarroye <alarroye@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:43:10 by alarroye          #+#    #+#             */
-/*   Updated: 2024/12/14 10:26:28 by alarroye         ###   ########lyon.fr   */
+/*   Updated: 2024/12/14 13:59:32 by alarroye         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1
+#  define BUFFER_SIZE 1000
 # endif
 # include <fcntl.h>
 # include <stdlib.h>
